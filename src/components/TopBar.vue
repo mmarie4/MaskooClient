@@ -5,7 +5,7 @@
         </div>
 
         <div class="text-xs"> 
-            A simple notebook, by a dev, for the devs
+            A simple notebook to keep things organized
         </div>
     </div>
 </template>
