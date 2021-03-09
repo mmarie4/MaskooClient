@@ -48,6 +48,7 @@ import axios from "axios";
 import router from "../router";
 import store from "../store/store";
 import { ref } from "vue";
+import parsers from "../utils/parsers.js"
 
 import JButton from "../components/JButton";
 import JInputText from "../components/JInputText";
@@ -76,6 +77,8 @@ export default {
     }
 
     const login = () => {
+      console.log(parsers)
+
       const body = { password: password.value, email: email.value };
 
       axios
@@ -84,8 +87,8 @@ export default {
           store.commit("setUser", response.data);
           router.push({ name: "Diary" });
         })
-        .catch((error) => {
-          errorMsg.value = error?.response?.data?.split('\n')?.[0]?.replace("System.Exception: ", "") || "Unexpected error"
+        .catch((e) => {
+          errorMsg.value = parsers.error(e)
         });
     };
 
@@ -104,8 +107,8 @@ export default {
           store.commit("setUser", response.data);
           router.push({ name: "Diary" });
         })
-        .catch((error) => {
-          errorMsg.value = error?.response?.data?.split('\n')?.[0]?.replace("System.Exception: ", "") || "Unexpected error"
+        .catch((e) => {
+          errorMsg.value = parsers.error(e)
         });
     };
 
