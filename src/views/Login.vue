@@ -3,13 +3,13 @@
 
     <!-- Login -->
     <div v-if="view === 'login'" class=w-6/12>
-      <div class="w-full bg-gray-700 p-8 rounded shadow">
+      <div class="w-full bg-gray-700 p-8 rounded shadow-md">
         <div class="text-lg text-gray-100 pb-6">Login</div>
 
         <j-input-text label="Email" name="email" type="email" v-model="email" />
         <j-input-text label="Password" name="password" type="password" v-model="password" />
 
-        <div v-if="errorMsg" class="p-2 text-xs text-red-500">{{errorMsg}}</div>
+        <div v-if="errorMsg" class="w-full text-center p-2 text-xs text-red-400">{{errorMsg}}</div>
 
         <div class="flex justify-center">
           <j-button class="mt-8" @click="login" size="normal" content="Login"/>
@@ -23,7 +23,7 @@
 
     <!-- Sign up -->
     <div v-if="view === 'signup'" class=w-6/12>
-      <div class="w-full bg-gray-700 p-8 rounded shadow">
+      <div class="w-full bg-gray-700 p-8 rounded shadow-md">
         <div class="text-lg text-gray-100 pb-6">Create an account</div>
 
         <j-input-text label="Email" name="email" type="email" v-model="email" />
@@ -72,6 +72,7 @@ export default {
       password.value = ""
       email.value = ""
       confirmPassword.value = ""
+      errorMsg.value = ""
     }
 
     const login = () => {
@@ -84,7 +85,7 @@ export default {
           router.push({ name: "Diary" });
         })
         .catch((error) => {
-          errorMsg.value = error?.response?.data?.split('\n')?.[0] || "Unexpected error"
+          errorMsg.value = error?.response?.data?.split('\n')?.[0]?.replace("System.Exception: ", "") || "Unexpected error"
         });
     };
 
@@ -104,7 +105,7 @@ export default {
           router.push({ name: "Diary" });
         })
         .catch((error) => {
-          errorMsg.value = error?.response?.data?.split('\n')?.[0] || "Unexpected error"
+          errorMsg.value = error?.response?.data?.split('\n')?.[0]?.replace("System.Exception: ", "") || "Unexpected error"
         });
     };
 
