@@ -5,13 +5,16 @@
     <div v-if="view === 'login'" class=w-6/12>
       <div class="w-full bg-gray-700 p-8 rounded shadow">
         <div class="text-lg text-gray-100 pb-6">Login</div>
-        <div class="text-xs text-gray-100">Email</div>
-        <input class="w-full rounded px-1" type="email" name="email" v-model="email"/>
-        <div class="mt-4 text-xs text-gray-100">Password</div>
-        <input class="w-full rounded px-1" type="password" name="password" v-model="password"/>
+
+        <j-input-text label="Email" name="email" type="email" v-model="email" />
+        <j-input-text label="Password" name="password" type="password" v-model="password" />
+
+        <div v-if="errorMsg" class="p-2 text-xs text-red-500">{{errorMsg}}</div>
+
         <div class="flex justify-center">
-        <j-button class="mt-8" @click="login" size="normal" content="Login"/>
+          <j-button class="mt-8" @click="login" size="normal" content="Login"/>
         </div>
+
       </div>
       <div class="text-right m-1 text-xs text-gray-200 text-light cursor-pointer" @click="toggleView">
         Not a member yet? Sign up for free
@@ -21,15 +24,16 @@
     <!-- Sign up -->
     <div v-if="view === 'signup'" class=w-6/12>
       <div class="w-full bg-gray-700 p-8 rounded shadow">
-        <div class="text-lg text-gray-100 pb-6">Sign up</div>
-        <div class="text-xs text-gray-100">Email</div>
-        <input class="w-full rounded px-1" type="email" name="email" v-model="email"/>
-        <div class="mt-4 text-xs text-gray-100">Password</div>
-        <input class="w-full rounded px-1" type="password" name="password" v-model="password"/>
-        <div class="mt-4 text-xs text-gray-100">Confirm password</div>
-        <input class="w-full rounded px-1" type="password" name="confirm-password" v-model="confirmPassword"/>
+        <div class="text-lg text-gray-100 pb-6">Create an account</div>
+
+        <j-input-text label="Email" name="email" type="email" v-model="email" />
+        <j-input-text label="Password" name="password" type="password" v-model="password" />
+        <j-input-text label="Confirm password" name="confirm-password" type="password" v-model="confirmPassword" />
+
+        <div v-if="errorMsg" class="w-full text-center p-2 text-xs text-red-400">{{errorMsg}}</div>
+
         <div class="flex justify-center">
-        <j-button class="mt-8" @click="signup" size="normal" content="Signup"/>
+          <j-button class="mt-8" @click="signup" size="normal" content="Sign up"/>
         </div>
       </div>
       <div class="text-right m-1 text-xs text-gray-200 text-light cursor-pointer" @click="toggleView">
@@ -46,10 +50,12 @@ import store from "../store/store";
 import { ref } from "vue";
 
 import JButton from "../components/JButton";
+import JInputText from "../components/JInputText";
 
 export default {
   components: {
     JButton,
+    JInputText
   },
 
   setup() {
@@ -78,12 +84,16 @@ export default {
           router.push({ name: "Diary" });
         })
         .catch((error) => {
-          console.log(error);
+          errorMsg.value = error?.response?.data?.split('\n')?.[0] || "Unexpected error"
         });
     };
 
     const signup = () => {
-      // TODO : check if pwd is twice the same
+      
+      if (password.value !== confirmPassword.value) {
+        errorMsg.value = "Passwords are not the same"
+        return
+      }
 
       const body = { password: password.value, email: email.value };
 
@@ -94,7 +104,7 @@ export default {
           router.push({ name: "Diary" });
         })
         .catch((error) => {
-          console.log(error);
+          errorMsg.value = error?.response?.data?.split('\n')?.[0] || "Unexpected error"
         });
     };
 
