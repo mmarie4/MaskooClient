@@ -77,7 +77,6 @@ export default {
     }
 
     const login = () => {
-      console.log(parsers)
 
       const body = { password: password.value, email: email.value };
 
