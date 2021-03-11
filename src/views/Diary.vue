@@ -1,12 +1,21 @@
 <template>
 <div class="bg-gray-600 flex-1 flex">
+
     <side-menu/>
 
     <!-- Diary -->
     <div v-if="data && data.days" class="flex-1 p-4">
+
+        <!-- top bar -->
+        <div class="w-full flex justify-between items-center pb-4">
+            <div> filters from / to</div>
+            <j-button @click="createDay" content="ADD"/>
+        </div>
+
+        <!-- days -->
         <div v-for="day in data.days"
              :key="day.id">
-             <day-box :day="day" :diaryId="data.id"/>
+             <day-box :day="day" :diaryId="data.id" class="mb-2"/>
         </div>
     </div>
 
@@ -26,14 +35,17 @@ import axios from "axios";
 import router from "../router";
 import store from "../store/store";
 import { ref, onMounted } from "vue"
+import moment from "moment"
 
 import SideMenu from "../components/SideMenu"
 import DayBox from "../components/DayBox"
+import JButton from "../components/JButton"
 
 export default {
     components: {
         SideMenu,
-        DayBox
+        DayBox,
+        JButton
     },
 
     setup() {
@@ -61,6 +73,20 @@ export default {
             errorMsg.value = parsers.error(e)
         }
 
+        const createDay = () => {
+            const body = { date: moment().format(), content: "" }
+            axios
+                .post(`${store.state.api}/api/diary/${data.value.id}/days`,
+                    body,
+                    { headers: { Authorization: `Bearer ${store.state.user.token}` } })
+                .then(() => {
+                    fetchDiary()
+                })
+                .catch((e) => {
+                    errorMsg.value = parsers.error(e)
+                });
+        }
+
         // Hooks
         onMounted(fetchDiary)
 
@@ -68,7 +94,8 @@ export default {
             data,
             errorMsg,
             fetchDiary,
-            handleError
+            handleError,
+            createDay
         }
 
     }

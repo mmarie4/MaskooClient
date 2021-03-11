@@ -9,7 +9,8 @@ export default {
             type: String
         },
         size: {
-            type: String
+            type: String,
+            default: "small"
         }
     },
 
@@ -20,7 +21,7 @@ export default {
             buttonClass = "rounded bg-blue-600 px-4 py-2 text-md text-gray-200 hover:bg-blue-700"
         }
         else if (props.size === "small") {
-            buttonClass = "rounded bg-blue-300 p-2 text-xs text-gray-200"
+            buttonClass = "rounded bg-blue-600 p-2 text-xs text-gray-200"
         }
 
         return { buttonClass }
