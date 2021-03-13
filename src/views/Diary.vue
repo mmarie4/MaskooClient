@@ -8,7 +8,11 @@
 
         <!-- top bar -->
         <div class="w-full flex justify-between items-center pb-4">
-            <div> filters from / to</div>
+            <div class="flex items-center">
+                <img src="@/assets/arrow-left.png" class="w-4" />
+                <div class="text-xs text-gray-100 px-2"> Current week </div>
+                <img src="@/assets/arrow-right.png" class="w-4" />
+            </div>
             <j-button @click="createDay" content="ADD"/>
         </div>
 

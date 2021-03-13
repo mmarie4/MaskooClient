@@ -4,7 +4,9 @@
             Maskoo
         </div>
 
-        <div v-if="isLogged()" class="cursor-pointer font-bold">Settings</div>
+        <div v-if="isLogged()" class="cursor-pointer font-bold">
+            <img src="@/assets/settings-icon.png" class="w-6" />
+        </div>
 
         <div v-else class="text-xs"> 
             A simple notebook to keep things organized
