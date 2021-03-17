@@ -5,7 +5,6 @@
     <div class="flex justify-between text-xs">
       <div class="font-bold">{{ formattedDate }}</div>
       <div class="flex">
-        <div class="cursor-pointer" @click="deleteDay">DEL</div>
       </div>
     </div>
 
@@ -45,7 +44,7 @@ export default {
         const onBlur = () => {
             const body = { date: props.day.date, content: textInput.value } 
             axios
-                .put(`${store.state.api}/api/diary/${props.diaryId}/days/${props.day.id}`,
+                .patch(`${store.state.api}/api/diary/${props.diaryId}/days`,
                     body,
                     { headers: { Authorization: `Bearer ${store.state.user.token}` } })
                 .then((response) => {

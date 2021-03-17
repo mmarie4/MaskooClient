@@ -1,108 +1,139 @@
 <template>
-<div class="bg-gray-600 flex-1 flex">
-
-    <side-menu/>
+  <div class="bg-gray-600 flex-1 flex">
+    <side-menu />
 
     <!-- Diary -->
-    <div v-if="data && data.days" class="flex-1 p-4">
-
-        <!-- top bar -->
-        <div class="w-full flex justify-between items-center pb-4">
-            <div class="flex items-center">
-                <img src="@/assets/arrow-left.png" class="w-4" />
-                <div class="text-xs text-gray-100 px-2"> Current week </div>
-                <img src="@/assets/arrow-right.png" class="w-4" />
-            </div>
-            <j-button @click="createDay" content="ADD"/>
+    <div v-if="days" class="flex-1 p-4">
+      <!-- top bar -->
+      <div class="w-full flex justify-between items-center pb-4">
+        <div class="flex items-center">
+          <img src="@/assets/arrow-left.png" class="w-4 cursor-pointer" @click="previousWeek" />
+          <div class="text-xs text-gray-100 px-2 font-bold">Week</div>
+          <img src="@/assets/arrow-right.png" class="w-4 cursor-pointer" @click="nextWeek" />
         </div>
+      </div>
 
-        <!-- days -->
-        <div v-for="day in data.days"
-             :key="day.id">
-             <day-box :day="day" :diaryId="data.id" class="mb-2"/>
-        </div>
+      <!-- days -->
+      <div v-for="day in days" :key="day.date + '-' + day.key">
+        <day-box :day="day" :diaryId="data.id" class="mb-2" />
+      </div>
     </div>
 
     <!-- Error msg -->
-    <div v-if="errorMsg"
-         class="rounded bg-red-500 text-gray-300 p-2 absolute text-xs cursor-pointer"
-         style="bottom: 20px; right: 20px;"
-         @click="errorMsg = null"
-         @error="handleError"> {{errorMsg}} </div>
-
-</div>
+    <div
+      v-if="errorMsg"
+      class="rounded bg-red-500 text-gray-300 p-2 absolute text-xs cursor-pointer"
+      style="bottom: 20px; right: 20px"
+      @click="errorMsg = null"
+      @error="handleError"
+    >
+      {{ errorMsg }}
+    </div>
+  </div>
 </template>
 
 <script>
-import parsers from "../utils/parsers.js"
+import parsers from "../utils/parsers.js";
 import axios from "axios";
 import router from "../router";
 import store from "../store/store";
-import { ref, onMounted } from "vue"
-import moment from "moment"
+import { ref, onMounted } from "vue";
+import moment from "moment";
 
-import SideMenu from "../components/SideMenu"
-import DayBox from "../components/DayBox"
-import JButton from "../components/JButton"
+import SideMenu from "../components/SideMenu";
+import DayBox from "../components/DayBox";
 
 export default {
-    components: {
-        SideMenu,
-        DayBox,
-        JButton
-    },
+  components: {
+    SideMenu,
+    DayBox
+  },
 
-    setup() {
+  setup() {
+    if (!store.state?.user?.token) router.push("/");
 
-        if (!store.state?.user?.token) router.push("/")
+    // Data
+    const now = moment();
+    let days = ref([
+      {
+        date: now.clone().weekday(1), content: "", key: 0
+      },
+      {
+        date: now.clone().weekday(2), content: "", key: 0
+      },
+      {
+        date: now.clone().weekday(3), content: "", key: 0
+      },
+      {
+        date: now.clone().weekday(4), content: "", key: 0
+      },
+      {
+        date: now.clone().weekday(5), content: "", key: 0
+      },
+      {
+        date: now.clone().weekday(6), content: "", key: 0
+      },
+      {
+        date: now.clone().weekday(7), content: "", key: 0
+      },
+    ]);
+    let data = ref({ days: [] });
+    let errorMsg = ref();
 
-        // Data
-        let data = ref({days: []})
-        let errorMsg = ref()
+    // Methods
+    const fetchDiary = () => {
+      axios
+        .get(store.state.api + "/api/diary", {
+          headers: { Authorization: `Bearer ${store.state.user.token}` },
+        })
+        .then((r) => {
+          ({ data: data.value, errorMsg: errorMsg.value } = parsers.data(r));
+          data.value.days.forEach(x => {
+              let day = days.value
+                .find(d => d.date.format("DDMMYYYY") === moment(x.date).format("DDMMYYYY"))
+              if(day) day.content = x.content
+          })
+          days.value.forEach(d => d.key++)
+        })
+        .catch((e) => {
+          console.error(e)
+          errorMsg.value = parsers.error(e);
+        });
+    };
 
-        // Methods
-        const fetchDiary = () => {
-            axios
-                .get(store.state.api + "/api/diary", { headers: { Authorization: `Bearer ${store.state.user.token}` } })
-                .then((r) => {
-                    ({ data: data.value, errorMsg: errorMsg.value } = parsers.data(r))
-                })
-                .catch((e) => {
-                    errorMsg.value = parsers.error(e)
-                });
-        }
+    const handleError = (e) => {
+      console.error(e);
+      errorMsg.value = parsers.error(e);
+    };
 
-        const handleError = (e) => {
-            console.log("error received:", e)
-            errorMsg.value = parsers.error(e)
-        }
-
-        const createDay = () => {
-            const body = { date: moment().format(), content: "" }
-            axios
-                .post(`${store.state.api}/api/diary/${data.value.id}/days`,
-                    body,
-                    { headers: { Authorization: `Bearer ${store.state.user.token}` } })
-                .then(() => {
-                    fetchDiary()
-                })
-                .catch((e) => {
-                    errorMsg.value = parsers.error(e)
-                });
-        }
-
-        // Hooks
-        onMounted(fetchDiary)
-
-        return {
-            data,
-            errorMsg,
-            fetchDiary,
-            handleError,
-            createDay
-        }
-
+    const previousWeek = () => {
+      days.value.forEach(d => {
+        d.content = ""
+        d.date.subtract(7, "days")
+      })
+      fetchDiary()
     }
 
-}
+    const nextWeek = () => {
+      days.value.forEach(d => {
+        d.content = ""
+        d.date.add(7, "days")
+      })
+      fetchDiary()
+    }
+
+    // Hooks
+    onMounted(fetchDiary);
+
+    return {
+      days,
+      data,
+      errorMsg,
+      fetchDiary,
+      handleError,
+      previousWeek,
+      nextWeek
+    };
+  },
+};
 </script>
