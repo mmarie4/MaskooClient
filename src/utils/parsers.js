@@ -15,5 +15,7 @@ export default {
         } else {
             return { data: null, errorMsg: "Error parsing server response" }
         }
-    }
+    },
+
+    dateParam: (date) => date.substring(1, date.length - 1)
 }

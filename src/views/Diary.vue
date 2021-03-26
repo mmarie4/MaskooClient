@@ -8,7 +8,7 @@
       <div class="w-full flex justify-between items-center pb-4">
         <div class="flex items-center">
           <img src="@/assets/arrow-left.png" class="w-4 cursor-pointer" @click="previousWeek" />
-          <div class="text-xs text-gray-100 px-2 font-bold">Week</div>
+          <div class="text-xs text-gray-100 px-2 font-bold">{{getWeekDisplayName(days[0].date)}}</div>
           <img src="@/assets/arrow-right.png" class="w-4 cursor-pointer" @click="nextWeek" />
         </div>
       </div>
@@ -85,9 +85,14 @@ export default {
       axios
         .get(store.state.api + "/api/diary", {
           headers: { Authorization: `Bearer ${store.state.user.token}` },
+          params: {
+              from: days.value[0].date.toISOString(),
+              to: days.value[0].date.clone().add(7, "days").toISOString()
+          }
         })
         .then((r) => {
           ({ data: data.value, errorMsg: errorMsg.value } = parsers.data(r));
+          console.log(data)
           data.value.days.forEach(x => {
               let day = days.value
                 .find(d => d.date.format("DDMMYYYY") === moment(x.date).format("DDMMYYYY"))
@@ -122,6 +127,17 @@ export default {
       fetchDiary()
     }
 
+    const getWeekDisplayName = (firstDay) => {
+      var date = moment(firstDay)
+      var firstDayOfThisWeek = now.clone().weekday(1)
+      console.log(date)
+      console.log(firstDayOfThisWeek)
+      if (date.isSame(firstDayOfThisWeek, "day")) return "Current week"
+      if (date.isSame(firstDayOfThisWeek.clone().add(1, "week"), "day")) return "Next week"
+      if (date.isSame(firstDayOfThisWeek.clone().subtract(1, "week"), "day")) return "Last week"
+      return `${date.format("DD/MM")} to ${date.clone().add(1, "week").format("DD/MM")}`
+    }
+
     // Hooks
     onMounted(fetchDiary);
 
@@ -132,7 +148,8 @@ export default {
       fetchDiary,
       handleError,
       previousWeek,
-      nextWeek
+      nextWeek,
+      getWeekDisplayName
     };
   },
 };
