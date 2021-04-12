@@ -1,6 +1,44 @@
 <template>
-  <div class="w-full bg-gray-600 flex-1 flex">
+  <div class="bg-gray-600 flex-1 flex">
     <side-menu />
+
+    <div v-if="isFetched" class="flex-1 p-4">
+      <!-- header -->
+      <div class="flex justify-between items-center mb-4">
+        <j-input-text
+          class="w-8/12 text-sm"
+          v-model="searchTerm"
+          placeholder="Search..."
+          @input="onSearch"
+          @keyup:enter="fetchNotes"
+        />
+        <j-button @click="createNote" size="small" content="Add" />
+      </div>
+
+      <!-- Notes -->
+      <div v-for="note in notes" :key="note.id + '-' + note.key">
+        <note-box
+          :note="note"
+          class="mb-2"
+          @error="handleError"
+          @delete:success="fetchNotes"
+        />
+      </div>
+    </div>
+
+    <div class="flex-1 flex justify-center p-8" v-else>
+      <j-spinner />
+    </div>
+
+    <!-- Error msg -->
+    <div
+      v-if="errorMsg"
+      class="rounded bg-red-500 text-gray-300 p-2 absolute text-xs cursor-pointer"
+      style="bottom: 20px; right: 20px"
+      @click="errorMsg = null"
+    >
+      {{ errorMsg }}
+    </div>
   </div>
 </template>
 
@@ -10,29 +48,46 @@ import axios from "axios";
 import router from "../router";
 import store from "../store/store";
 import { ref, onMounted } from "vue";
+import debounce from "debounce";
 
 import SideMenu from "../components/SideMenu";
+import JButton from "../components/JButton";
+import NoteBox from "../components/NoteBox";
+import JInputText from "../components/JInputText";
+import JSpinner from "../components/JSpinner";
 
 export default {
   components: {
     SideMenu,
+    JButton,
+    NoteBox,
+    JInputText,
+    JSpinner,
   },
 
   setup() {
     if (!store.state?.user?.token) router.push("/");
 
-    let errorMsg = ref()
-    let data = ref()
-    let notes = ref([])
+    let errorMsg = ref();
+    let notes = ref([]);
+    let isFetched = ref(false);
+    let searchTerm = ref("");
 
     // Methods
     const fetchNotes = () => {
       axios
-        .get(store.state.api + "/api/notes", {
-          headers: { Authorization: `Bearer ${store.state.user.token}` }
-        })
+        .get(
+          store.state.api +
+            `/api/notes${
+              searchTerm.value ? "?search_term=" + searchTerm.value : ""
+            }`,
+          {
+            headers: { Authorization: `Bearer ${store.state.user.token}` },
+          }
+        )
         .then((r) => {
-          ({ data: data.value, errorMsg: errorMsg.value } = parsers.data(r));
+          ({ data: notes.value, errorMsg: errorMsg.value } = parsers.data(r));
+          isFetched.value = true;
         })
         .catch((e) => {
           console.error(e);
@@ -40,20 +95,46 @@ export default {
         });
     };
 
-        const handleError = (e) => {
+    const onSearch = () => {
+      debounce(function (e) {
+        searchTerm.value = e.target.value;
+        fetchNotes();
+      }, 500);
+    };
+
+    const handleError = (e) => {
       console.error(e);
       errorMsg.value = parsers.error(e);
     };
 
-        // Hooks
+    const createNote = () => {
+      var body = { title: "New Note", content: "" };
+      isFetched.value = false;
+      axios
+        .post(store.state.api + "/api/notes", body, {
+          headers: { Authorization: `Bearer ${store.state.user.token}` },
+        })
+        .then(() => {
+          fetchNotes();
+        })
+        .catch((e) => {
+          console.error(e);
+          errorMsg.value = parsers.error(e);
+        });
+    };
+
+    // Hooks
     onMounted(fetchNotes);
 
-        return {
+    return {
+      searchTerm,
       notes,
-      data,
       errorMsg,
       fetchNotes,
-      handleError
+      handleError,
+      createNote,
+      isFetched,
+      onSearch
     };
   },
 };

@@ -1,11 +1,13 @@
 <template>
     <div>
         <div v-if="label" class="mt-4 text-xs text-gray-100"> {{label}} </div>
-        <input class="w-full rounded px-1"
+        <input class="w-full rounded px-1 outline-none bg-gray-300 text-gray-600 px-2 py-1"
                :type="type"
                :value="modelValue"
                :name="name"
-               @input="onInput" />
+               :placeholder="placeholder"
+               @input="onInput"
+               @keyup.enter="onEnter"/>
     </div>
 </template>
 
@@ -23,6 +25,9 @@ export default {
         },
         name: {
             type: String
+        },
+        placeholder: {
+            type: String
         }
     },
 
@@ -32,7 +37,11 @@ export default {
             context.emit('update:modelValue', e.currentTarget.value)
         }
 
-        return { onInput }
+        const onEnter = () => {
+            context.emit('keyup:enter')
+        }
+
+        return { onInput, onEnter }
     }
 }
 </script>

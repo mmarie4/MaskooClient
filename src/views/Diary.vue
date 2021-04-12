@@ -3,7 +3,7 @@
     <side-menu />
 
     <!-- Diary -->
-    <div v-if="days" class="flex-1 p-4">
+    <div v-if="isFetched" class="flex-1 p-4">
       <!-- top bar -->
       <div class="w-full flex justify-between items-center pb-4">
         <div class="flex items-center">
@@ -19,13 +19,16 @@
       </div>
     </div>
 
+    <div class="flex-1 flex justify-center p-8" v-else>
+      <j-spinner/>
+    </div>    
+
     <!-- Error msg -->
     <div
       v-if="errorMsg"
       class="rounded bg-red-500 text-gray-300 p-2 absolute text-xs cursor-pointer"
       style="bottom: 20px; right: 20px"
       @click="errorMsg = null"
-      @error="handleError"
     >
       {{ errorMsg }}
     </div>
@@ -42,11 +45,13 @@ import moment from "moment";
 
 import SideMenu from "../components/SideMenu";
 import DayBox from "../components/DayBox";
+import JSpinner from "../components/JSpinner";
 
 export default {
   components: {
     SideMenu,
-    DayBox
+    DayBox,
+    JSpinner
   },
 
   setup() {
@@ -54,6 +59,7 @@ export default {
 
     // Data
     const now = moment();
+    let isFetched = ref(false)
     let days = ref([
       {
         date: now.clone().weekday(1), content: "", key: 0
@@ -82,6 +88,7 @@ export default {
 
     // Methods
     const fetchDiary = () => {
+      isFetched.value = false
       axios
         .get(store.state.api + "/api/diary", {
           headers: { Authorization: `Bearer ${store.state.user.token}` },
@@ -92,13 +99,13 @@ export default {
         })
         .then((r) => {
           ({ data: data.value, errorMsg: errorMsg.value } = parsers.data(r));
-          console.log(data)
           data.value.days.forEach(x => {
               let day = days.value
                 .find(d => d.date.format("DDMMYYYY") === moment(x.date).format("DDMMYYYY"))
               if(day) day.content = x.content
           })
           days.value.forEach(d => d.key++)
+          isFetched.value = true
         })
         .catch((e) => {
           console.error(e)
@@ -130,8 +137,6 @@ export default {
     const getWeekDisplayName = (firstDay) => {
       var date = moment(firstDay)
       var firstDayOfThisWeek = now.clone().weekday(1)
-      console.log(date)
-      console.log(firstDayOfThisWeek)
       if (date.isSame(firstDayOfThisWeek, "day")) return "Current week"
       if (date.isSame(firstDayOfThisWeek.clone().add(1, "week"), "day")) return "Next week"
       if (date.isSame(firstDayOfThisWeek.clone().subtract(1, "week"), "day")) return "Last week"
@@ -142,6 +147,7 @@ export default {
     onMounted(fetchDiary);
 
     return {
+      isFetched,
       days,
       data,
       errorMsg,
