@@ -15,7 +15,7 @@
 import axios from "axios";
 import store from "../store/store";
 import moment from "moment";
-import JTextArea from "./JTextArea";
+import JTextArea from "./base/JTextArea";
 
 export default {
   components: {

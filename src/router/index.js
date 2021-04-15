@@ -1,6 +1,6 @@
 import { createWebHistory, createRouter } from "vue-router";
 import Diary from "@/views/Diary.vue";
-import Toolbox from "@/views/Toolbox.vue";
+import Tools from "@/views/Tools.vue";
 import Notes from "@/views/Notes.vue";
 import Login from "@/views/Login.vue";
 
@@ -16,9 +16,9 @@ const routes = [
         component: Diary,
     },
     {
-        path: "/toolbox",
-        name: "Toolbox",
-        component: Toolbox,
+        path: "/tools",
+        name: "Tools",
+        component: Tools,
     },
     {
         path: "/notes",

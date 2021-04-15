@@ -8,26 +8,22 @@
         <j-input-text
           class="w-8/12 text-sm"
           v-model="searchTerm"
-          placeholder="Search by note title..."
+          placeholder="Search by toolbox title..."
           @input="onSearch"
-          @keyup:enter="fetchNotes"
+          @keyup:enter="fetchAll"
         />
-        <j-button @click="createNote" size="small" content="Add" />
+        <j-button @click="createToolbox" size="small" content="Add" />
       </div>
 
       <!-- Notes -->
-      <div v-for="note in notes" :key="note.id + '-' + note.key">
-        <note-box
+      <div v-for="toolbox in toolboxes" :key="toolbox.id + '-' + toolbox.key">
+        <toolbox-box
           :note="note"
           class="mb-2"
           @error="handleError"
-          @delete:success="fetchNotes"
+          @delete:success="fetchAll"
         />
       </div>
-    </div>
-
-    <div class="flex-1 flex justify-center p-8" v-else>
-      <j-spinner />
     </div>
 
     <!-- Error msg -->
@@ -51,43 +47,44 @@ import router from "../router";
 import store from "../store/store";
 import { ref, onMounted } from "vue";
 
-import JButton from "../components/base/JButton";
 import JInputText from "../components/base/JInputText";
-import JSpinner from "../components/base/JSpinner";
-import NoteBox from "../components/NoteBox";
+import JButton from "../components/base/JButton";
 import SideMenu from "../components/SideMenu";
+import ToolboxBox from "../components/ToolboxBox";
 
 export default {
   components: {
-    SideMenu,
-    JButton,
-    NoteBox,
     JInputText,
-    JSpinner,
+    JButton,
+    SideMenu,
+    ToolboxBox,
   },
 
   setup() {
     if (!store.state?.user?.token) router.push("/");
 
     let errorMsg = ref();
-    let notes = ref([]);
+    let toolboxes = ref([]);
     let isFetched = ref(false);
-    let searchTerm = ref("");
+    let searchTerm = ref("")
 
     // Methods
-    const fetchNotes = () => {
+    const debounce = builders.debounce();
+
+    const handleError = (e) => {
+      console.error(e);
+      errorMsg.value = parsers.error(e);
+    };
+
+    const fetchAll = () => {
       axios
-        .get(
-          store.state.api +
-            `/api/notes${
-              searchTerm.value ? "?search_term=" + searchTerm.value : ""
-            }`,
-          {
-            headers: { Authorization: `Bearer ${store.state.user.token}` },
-          }
-        )
+        .get(store.state.api + `/api/toolbox`, {
+          headers: { Authorization: `Bearer ${store.state.user.token}` },
+        })
         .then((r) => {
-          ({ data: notes.value, errorMsg: errorMsg.value } = parsers.data(r));
+          ({ data: toolboxes.value, errorMsg: errorMsg.value } = parsers.data(
+            r
+          ));
           isFetched.value = true;
         })
         .catch((e) => {
@@ -96,29 +93,22 @@ export default {
         });
     };
 
-    const debounce = builders.debounce();
-
     const onSearch = (e) => {
       debounce(() => {
         searchTerm.value = e.target.value;
-        fetchNotes();
+        fetchAll();
       });
     };
 
-    const handleError = (e) => {
-      console.error(e);
-      errorMsg.value = parsers.error(e);
-    };
-
-    const createNote = () => {
-      var body = { title: "New Note", content: "" };
-      isFetched.value = false;
+    const fetchOne = (id) => {
       axios
-        .post(store.state.api + "/api/notes", body, {
+        .get(store.state.api + `/api/toolbox/${id}`, {
           headers: { Authorization: `Bearer ${store.state.user.token}` },
         })
-        .then(() => {
-          fetchNotes();
+        .then((r) => {
+          let res;
+          ({ data: res, errorMsg: errorMsg.value } = parsers.data(r));
+          return res;
         })
         .catch((e) => {
           console.error(e);
@@ -126,18 +116,33 @@ export default {
         });
     };
 
-    // Hooks
-    onMounted(fetchNotes);
+    const createToolbox = () => {
+      var body = { name: "New Toolbox" };
+      isFetched.value = false;
+      axios
+        .post(store.state.api + "/api/toolbox", body, {
+          headers: { Authorization: `Bearer ${store.state.user.token}` },
+        })
+        .then(() => {
+          fetchAll();
+        })
+        .catch((e) => {
+          console.error(e);
+          errorMsg.value = parsers.error(e);
+        });
+    };
+
+    onMounted(fetchAll);
 
     return {
-      searchTerm,
-      notes,
-      errorMsg,
-      fetchNotes,
-      handleError,
-      createNote,
       isFetched,
+      errorMsg,
+      toolboxes,
       onSearch,
+      fetchAll,
+      fetchOne,
+      createToolbox,
+      handleError,
     };
   },
 };

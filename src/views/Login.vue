@@ -50,8 +50,8 @@ import store from "../store/store";
 import { ref } from "vue";
 import parsers from "../utils/parsers.js"
 
-import JButton from "../components/JButton";
-import JInputText from "../components/JInputText";
+import JButton from "../components/base/JButton";
+import JInputText from "../components/base/JInputText";
 
 export default {
   components: {

@@ -2,7 +2,7 @@
   <div class="rounded bg-gray-500 text-gray-100 p-2">
     <!-- top bar -->
     <div class="flex justify-between text-xs pb-2">
-      <note-title :value="note.title" @updated="updateTitle" />
+      <j-editable-text :value="note.title" @updated="updateTitle" />
       <div
         class="text-gray-900 font-bold text-xs cursor-pointer"
         @click="deleteNote"
@@ -28,13 +28,13 @@ import axios from "axios";
 import store from "../store/store";
 import moment from "moment";
 
-import JTextArea from "./JTextArea";
-import NoteTitle from "../components/NoteTitle";
+import JTextArea from "./base/JTextArea";
+import JEditableText from "../components/base/JEditableText";
 
 export default {
   components: {
     JTextArea,
-    NoteTitle,
+    JEditableText,
   },
 
   props: {

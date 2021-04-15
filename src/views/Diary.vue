@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-600 flex-1 flex">
+  <div class="bg-gray-600 flex-col flex-1 sm:flex sm:flex-row">
     <side-menu />
 
     <!-- Diary -->
@@ -45,7 +45,7 @@ import moment from "moment";
 
 import SideMenu from "../components/SideMenu";
 import DayBox from "../components/DayBox";
-import JSpinner from "../components/JSpinner";
+import JSpinner from "../components/base/JSpinner";
 
 export default {
   components: {
