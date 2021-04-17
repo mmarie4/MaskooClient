@@ -18,7 +18,7 @@
       <!-- Notes -->
       <div v-for="toolbox in toolboxes" :key="toolbox.id + '-' + toolbox.key">
         <toolbox-box
-          :note="note"
+          :toolbox="toolbox"
           class="mb-2"
           @error="handleError"
           @delete:success="fetchAll"

@@ -40,7 +40,7 @@ export default {
   setup(props, context) {
 
     const updateTitle = (e) => {
-      const body = { name: e, content: props.note.content };
+      const body = { name: e };
       axios
         .put(`${store.state.api}/api/toolbox/${props.toolbox.id}`, body, {
           headers: { Authorization: `Bearer ${store.state.user.token}` },
@@ -55,7 +55,7 @@ export default {
 
     const deleteToolbox = () => {
       axios
-        .delete(`${store.state.api}/api/toolbox/${props.note.id}`, {
+        .delete(`${store.state.api}/api/toolbox/${props.toolbox.id}`, {
           headers: { Authorization: `Bearer ${store.state.user.token}` },
         })
         .then(() => {
