@@ -23,6 +23,9 @@ export default {
         else if (props.size === "small") {
             buttonClass = "rounded bg-blue-600 p-2 text-xs text-gray-200 font-bold"
         }
+        else if (props.size === "xsmall") {
+            buttonClass = "rounded focus:outline-none text-xs text-blue-300 font-bold"
+        }
 
         return { buttonClass }
     }

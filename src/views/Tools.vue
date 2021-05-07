@@ -12,18 +12,24 @@
           @input="onSearch"
           @keyup:enter="fetchAll"
         />
-        <j-button @click="createToolbox" size="small" content="Add" />
+        <j-button @click="createToolbox" size="small" content="Add Toolbox" />
       </div>
 
-      <!-- Notes -->
+      <!-- Toolboxes -->
       <div v-for="toolbox in toolboxes" :key="toolbox.id + '-' + toolbox.key">
         <toolbox-box
           :toolbox="toolbox"
           class="mb-2"
           @error="handleError"
           @delete:success="fetchAll"
+          @tool:added="fetchAll"
         />
       </div>
+    </div>
+
+    <!-- Loader -->
+    <div class="flex-1 flex justify-center p-8" v-else>
+      <j-spinner />
     </div>
 
     <!-- Error msg -->
@@ -49,6 +55,7 @@ import { ref, onMounted } from "vue";
 
 import JInputText from "../components/base/JInputText";
 import JButton from "../components/base/JButton";
+import JSpinner from "../components/base/JSpinner";
 import SideMenu from "../components/SideMenu";
 import ToolboxBox from "../components/ToolboxBox";
 
@@ -56,6 +63,7 @@ export default {
   components: {
     JInputText,
     JButton,
+    JSpinner,
     SideMenu,
     ToolboxBox,
   },
@@ -78,9 +86,15 @@ export default {
 
     const fetchAll = () => {
       axios
-        .get(store.state.api + `/api/toolbox`, {
-          headers: { Authorization: `Bearer ${store.state.user.token}` },
-        })
+        .get(
+          store.state.api +
+            `/api/toolbox${
+              searchTerm.value ? "?search_term=" + searchTerm.value : ""
+            }`,
+          {
+            headers: { Authorization: `Bearer ${store.state.user.token}` },
+          }
+        )
         .then((r) => {
           ({ data: toolboxes.value, errorMsg: errorMsg.value } = parsers.data(
             r
@@ -136,6 +150,7 @@ export default {
 
     return {
       isFetched,
+      searchTerm,
       errorMsg,
       toolboxes,
       onSearch,

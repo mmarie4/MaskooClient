@@ -12,7 +12,7 @@
           @input="onSearch"
           @keyup:enter="fetchNotes"
         />
-        <j-button @click="createNote" size="small" content="Add" />
+        <j-button @click="createNote" size="small" content="Add Note" />
       </div>
 
       <!-- Notes -->
@@ -26,6 +26,7 @@
       </div>
     </div>
 
+    <!-- Loader -->
     <div class="flex-1 flex justify-center p-8" v-else>
       <j-spinner />
     </div>

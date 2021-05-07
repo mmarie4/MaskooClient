@@ -13,8 +13,13 @@
 
     <!-- Tools -->
     <div v-for="tool in toolbox.tools" :key="tool.id" class="flex justify-between p-2">
-        <j-editable :value="tool.label" @updated="updateToolLabel(tool.id, $event)" />
-        <!-- TODO: tool value -->
+        <j-editable-text :value="tool.label" @updated="updateToolLabel(tool.id, $event)" />
+        <div @click="onClickToolValue">{{tool.value}}</div>
+    </div>
+
+    <!-- Create tool button -->
+    <div class="flex w-full justify-end">
+      <j-button size="xsmall" content="+ Add Tool" @click="createTool(toolbox.id)"/>
     </div>
 
   </div>
@@ -23,12 +28,15 @@
 <script>
 import axios from "axios";
 import store from "../store/store";
+import parsers from "../utils/parsers.js"
 
 import JEditableText from "./base/JEditableText";
+import JButton from "./base/JButton";
 
 export default {
   components: {
     JEditableText,
+    JButton
   },
 
   props: {
@@ -66,7 +74,31 @@ export default {
         });
     };
 
-    return { updateTitle, deleteToolbox };
+    const createTool = (toolboxId) => {
+      var body = { label: "New Tool", value: "" };
+      axios
+        .post(store.state.api + `/api/toolbox/${toolboxId}/tools`, body, {
+          headers: { Authorization: `Bearer ${store.state.user.token}` },
+        })
+        .then(() => {
+          context.emit("tool:added");
+        })
+        .catch((e) => {
+          console.error(e);
+          context.emit("error", parsers.error(e));
+        });
+    }
+
+    const onClickToolValue = (e) => {
+      console.log(e)
+      /*
+      e.srcElement.select();
+      document.execCommand("copy");
+      window.getSelection().empty();
+      */
+    }
+
+    return { updateTitle, deleteToolbox, createTool, onClickToolValue };
   },
 };
 </script>
