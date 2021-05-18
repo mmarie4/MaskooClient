@@ -4,6 +4,7 @@ const store = createStore({
 
    state:{
        api: "http://51.38.68.118:7000"
+       //api: "http://localhost:7000"
    },
 
    mutations: {
