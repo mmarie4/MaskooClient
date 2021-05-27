@@ -16,6 +16,7 @@
       </div>
 
       <!-- Toolboxes -->
+      <!-- TODO: Fetch only toolbox after tool:added and tool:deleted -->
       <div v-for="toolbox in toolboxes" :key="toolbox.id + '-' + toolbox.key">
         <toolbox-box
           :toolbox="toolbox"
@@ -23,6 +24,7 @@
           @error="handleError"
           @delete:success="fetchAll"
           @tool:added="fetchAll"
+          @tool:deleted="fetchAll"
         />
       </div>
     </div>

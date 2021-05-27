@@ -24,7 +24,7 @@
         />
         <div class="text-xs rounded text-gray-600 bg-gray-400 px-2 leading-normal cursor-pointer w-full" @click="onClickToolValue">{{ tool.value }}</div>
       </div>
-      <div class="text-xs text-gray-400 cursor-pointer" @click="deleteTool(tool.id)">✕</div>
+      <div class="text-xs text-gray-400 cursor-pointer" @click="deleteTool(id)">✕</div>
     </div>
 
     <!-- Create tool button -->
@@ -136,7 +136,20 @@ export default {
     };
 
     const deleteTool = (id) => {
-      console.log("deleting tool", id);
+      axios
+        .delete(
+          store.state.api + `/api/toolbox/${props.toolbox.id}/tools/${id}`,
+          {
+            headers: { Authorization: `Bearer ${store.state.user.token}` },
+          }
+        )
+        .then(() => {
+          context.emit("tool:deleted");
+        })
+        .catch((e) => {
+          console.error(e);
+          context.emit("error", parsers.error(e));
+        });
     };
 
     return {
