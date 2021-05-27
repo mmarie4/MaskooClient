@@ -16,15 +16,14 @@
       </div>
 
       <!-- Toolboxes -->
-      <!-- TODO: Fetch only toolbox after tool:added and tool:deleted -->
       <div v-for="toolbox in toolboxes" :key="toolbox.id + '-' + toolbox.key">
         <toolbox-box
           :toolbox="toolbox"
           class="mb-2"
           @error="handleError"
           @delete:success="fetchAll"
-          @tool:added="fetchAll"
-          @tool:deleted="fetchAll"
+          @tool:added="fetchOne(toolbox.id)"
+          @tool:deleted="fetchOne(toolbox.id)"
         />
       </div>
     </div>
@@ -124,7 +123,7 @@ export default {
         .then((r) => {
           let res;
           ({ data: res, errorMsg: errorMsg.value } = parsers.data(r));
-          return res;
+          toolboxes.value = toolboxes.value.map(x => x.id == id ? res : x)
         })
         .catch((e) => {
           console.error(e);

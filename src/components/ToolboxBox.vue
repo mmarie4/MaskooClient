@@ -24,7 +24,7 @@
         />
         <div class="text-xs rounded text-gray-600 bg-gray-400 px-2 leading-normal cursor-pointer w-full" @click="onClickToolValue">{{ tool.value }}</div>
       </div>
-      <div class="text-xs text-gray-400 cursor-pointer" @click="deleteTool(id)">✕</div>
+      <div class="text-xs text-gray-400 cursor-pointer" @click="deleteTool(tool.id)">✕</div>
     </div>
 
     <!-- Create tool button -->
