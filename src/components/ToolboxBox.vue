@@ -37,7 +37,7 @@
     </div>
 
     <!-- Add tool modal -->
-    <j-modal v-if="showAddToolModal" :title="'Add tool to ' + toolbox.label">
+    <j-modal v-if="showAddToolModal" :title="'Add tool to ' + toolbox.label" @click:outside="onClickOutsideModal">
       <div class="p-2">
         <j-input-text label="Tool name" v-model="newToolName" />
         <j-input-text label="Tool value" v-model="newToolValue" />
@@ -156,6 +156,12 @@ export default {
         });
     };
 
+    const onClickOutsideModal = () => {
+      showAddToolModal.value = false
+      newToolName.value = ""
+      newToolValue.value = ""
+    }
+
     return {
       newToolName,
       newToolValue,
@@ -165,6 +171,7 @@ export default {
       createTool,
       onClickToolValue,
       deleteTool,
+      onClickOutsideModal
     };
   },
 };

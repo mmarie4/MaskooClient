@@ -66,6 +66,8 @@ export default {
     let password = ref();
     let confirmPassword = ref()
     let errorMsg = ref();
+    
+    const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
 
     // methods
     const toggleView = () => {
@@ -92,6 +94,11 @@ export default {
     };
 
     const signup = () => {
+
+      if (!email.value || !emailRegex.test(email.value)) {
+        errorMsg.value = "Email is invalid"
+        return
+      }
       
       if (password.value !== confirmPassword.value) {
         errorMsg.value = "Passwords are not the same"
