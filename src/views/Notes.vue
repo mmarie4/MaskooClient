@@ -32,14 +32,8 @@
     </div>
 
     <!-- Error msg -->
-    <div
-      v-if="errorMsg"
-      class="rounded bg-red-500 text-gray-300 p-2 absolute text-xs cursor-pointer"
-      style="bottom: 20px; right: 20px"
-      @click="errorMsg = null"
-    >
-      {{ errorMsg }}
-    </div>
+    <j-toast :message="errorMsg" type="error" />
+    
   </div>
 </template>
 
@@ -53,6 +47,7 @@ import store from "../store/store";
 import { ref, onMounted } from "vue";
 
 import JButton from "../components/base/JButton";
+import JToast from "../components/base/JToast";
 import JInputText from "../components/base/JInputText";
 import JSpinner from "../components/base/JSpinner";
 import NoteBox from "../components/NoteBox";
@@ -62,6 +57,7 @@ export default {
   components: {
     SideMenu,
     JButton,
+    JToast,
     NoteBox,
     JInputText,
     JSpinner,

@@ -22,7 +22,7 @@
           :value="tool.label"
           @updated="updateToolLabel(tool.id, $event)"
         />
-        <div class="text-xs rounded text-gray-600 bg-gray-400 px-2 leading-normal cursor-pointer w-full" @click="onClickToolValue">{{ tool.value }}</div>
+        <div class="text-xs rounded text-gray-600 bg-gray-400 px-2 leading-normal cursor-pointer w-full" @click="onClickToolValue(tool)">{{ tool.value }}</div>
       </div>
       <div class="text-xs text-gray-400 cursor-pointer" @click="deleteTool(tool.id)">✕</div>
     </div>
@@ -52,6 +52,7 @@ import axios from "axios";
 import store from "../store/store";
 import parsers from "../utils/parsers.js";
 import { ref } from "vue"
+import useClipboard from 'vue-clipboard3'
 
 import JEditableText from "./base/JEditableText";
 import JButton from "./base/JButton";
@@ -73,6 +74,9 @@ export default {
   },
 
   setup(props, context) {
+    
+    const { toClipboard } = useClipboard()
+
     let newToolName = ref("");
     let newToolValue = ref("");
     let showAddToolModal = ref(false);
@@ -126,14 +130,14 @@ export default {
         });
     };
 
-    const onClickToolValue = (e) => {
-      console.log(e);
-      /*
-      e.srcElement.select();
-      document.execCommand("copy");
-      window.getSelection().empty();
-      */
-    };
+    const onClickToolValue = async (tool) => {
+      try {
+        await toClipboard(tool.value)
+        context.emit("tool:copied", tool.label)
+      } catch (e) {
+        console.error(e)
+      }
+    }
 
     const deleteTool = (id) => {
       console.log("deleting tool", id);

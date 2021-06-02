@@ -24,14 +24,8 @@
     </div>    
 
     <!-- Error msg -->
-    <div
-      v-if="errorMsg"
-      class="rounded bg-red-500 text-gray-300 p-2 absolute text-xs cursor-pointer"
-      style="bottom: 20px; right: 20px"
-      @click="errorMsg = null"
-    >
-      {{ errorMsg }}
-    </div>
+    <j-toast :message="errorMsg" type="error" />
+
   </div>
 </template>
 
@@ -46,12 +40,14 @@ import moment from "moment";
 import SideMenu from "../components/SideMenu";
 import DayBox from "../components/DayBox";
 import JSpinner from "../components/base/JSpinner";
+import JToast from "../components/base/JToast";
 
 export default {
   components: {
     SideMenu,
     DayBox,
-    JSpinner
+    JSpinner,
+    JToast
   },
 
   setup() {

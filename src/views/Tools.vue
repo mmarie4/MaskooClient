@@ -23,6 +23,7 @@
           @error="handleError"
           @delete:success="fetchAll"
           @tool:added="fetchAll"
+          @tool:copied="onToolCopied"
         />
       </div>
     </div>
@@ -32,15 +33,10 @@
       <j-spinner />
     </div>
 
-    <!-- Error msg -->
-    <div
-      v-if="errorMsg"
-      class="rounded bg-red-500 text-gray-300 p-2 absolute text-xs cursor-pointer"
-      style="bottom: 20px; right: 20px"
-      @click="errorMsg = null"
-    >
-      {{ errorMsg }}
-    </div>
+    <!-- Toasts -->
+    <j-toast :message="errorMsg" type="error"/>
+    <j-toast :message="infoMsg" type="info"/>
+
   </div>
 </template>
 
@@ -56,6 +52,7 @@ import { ref, onMounted } from "vue";
 import JInputText from "../components/base/JInputText";
 import JButton from "../components/base/JButton";
 import JSpinner from "../components/base/JSpinner";
+import JToast from "../components/base/JToast";
 import SideMenu from "../components/SideMenu";
 import ToolboxBox from "../components/ToolboxBox";
 
@@ -64,6 +61,7 @@ export default {
     JInputText,
     JButton,
     JSpinner,
+    JToast,
     SideMenu,
     ToolboxBox,
   },
@@ -72,6 +70,7 @@ export default {
     if (!store.state?.user?.token) router.push("/");
 
     let errorMsg = ref();
+    let infoMsg = ref();
     let toolboxes = ref([]);
     let isFetched = ref(false);
     let searchTerm = ref("")
@@ -146,11 +145,16 @@ export default {
         });
     };
 
+    const onToolCopied = (toolName) => {
+      infoMsg.value = `${toolName} copied to clipboard !`
+    }
+
     onMounted(fetchAll);
 
     return {
       isFetched,
       searchTerm,
+      infoMsg,
       errorMsg,
       toolboxes,
       onSearch,
@@ -158,6 +162,7 @@ export default {
       fetchOne,
       createToolbox,
       handleError,
+      onToolCopied
     };
   },
 };
