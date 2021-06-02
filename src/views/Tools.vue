@@ -22,7 +22,8 @@
           class="mb-2"
           @error="handleError"
           @delete:success="fetchAll"
-          @tool:added="fetchAll"
+          @tool:added="fetchOne(toolbox.id)"
+          @tool:deleted="fetchOne(toolbox.id)"
           @tool:copied="onToolCopied"
         />
       </div>
@@ -121,7 +122,7 @@ export default {
         .then((r) => {
           let res;
           ({ data: res, errorMsg: errorMsg.value } = parsers.data(r));
-          return res;
+          toolboxes.value = toolboxes.value.map(x => x.id == id ? res : x)
         })
         .catch((e) => {
           console.error(e);

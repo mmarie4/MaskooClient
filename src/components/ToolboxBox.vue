@@ -140,7 +140,20 @@ export default {
     }
 
     const deleteTool = (id) => {
-      console.log("deleting tool", id);
+      axios
+        .delete(
+          store.state.api + `/api/toolbox/${props.toolbox.id}/tools/${id}`,
+          {
+            headers: { Authorization: `Bearer ${store.state.user.token}` },
+          }
+        )
+        .then(() => {
+          context.emit("tool:deleted");
+        })
+        .catch((e) => {
+          console.error(e);
+          context.emit("error", parsers.error(e));
+        });
     };
 
     return {
