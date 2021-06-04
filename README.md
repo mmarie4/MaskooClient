@@ -1,5 +1,4 @@
 ## How to use
-App deployed [here](http://51.38.68.118:8081)
 
 Create an account and use features:
 - Diary to store your activity every days
